@@ -5,7 +5,7 @@ Based on the API provided by HackerNews at: https://hackernews.api-docs.io/v0/ov
 The "HackerNewsApi Crawler" is a small tool written in Haskell used to crawl through HackerNews' stories data using their API
 and to find out who the top `x` commentors of the top `y` stories are, along with their number of comments.
 
-By default, the information w.r.t. the top 10 commentors are sought, from within the top 30 stories.
+By default, the information w.r.t. the top 10 commentors are sought from within the top 30 stories.
 
 
 To run this tool, simply use `stack build`, followed by `stack run`. Note that it may take, on average, about 3 seconds to obtain
