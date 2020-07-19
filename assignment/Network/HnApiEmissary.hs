@@ -34,7 +34,7 @@ import Data.Maybe
 import Data.IORef
 import Data.HashMap.Lazy hiding (filter, null)
 import Data.List hiding (insert)
-import Data.Either.Utils (fromRight)
+import Data.Either.Utils as DEU (fromRight)
 import Data.Either
 
 {- "GHC" Library Imports -}
@@ -108,7 +108,7 @@ hnCommentStream itemUrlRoot userNoOfCommentsMapIORef n upstream = do
     -- Execute a recursive call to be able to visit a lower level of the tree.
     adapt $ hnCommentStream itemUrlRoot userNoOfCommentsMapIORef (n - 1) $
         -- Obtain the subcomments of the set of comments coming from the upstream.
-        SP.concatMapWith async 
+        SP.concatMapWith async
             (\commentId -> do
                 {-
                     1. Obtain the JSON resource corresponding to the given comment id.
@@ -172,7 +172,7 @@ hnConcurrentLevelByLevel :: forall t m
     -> t m ()
 hnConcurrentLevelByLevel userNoOfCommentsMapIORef itemUrlRoot noOfStories =
     -- Update our hashmap according to the incoming comments.
-    (asyncly $ SP.concatMapWith async 
+    (asyncly $ SP.concatMapWith async
         (\(comments, _, _) -> do
             liftIO $ mapConcurrently
                 (\comment -> do
@@ -228,7 +228,7 @@ hnConcurrentLevelByLevel userNoOfCommentsMapIORef itemUrlRoot noOfStories =
             Prelude.map (\subTreeId -> itemUrlRoot <> (show subTreeId) <> ".json") 
                 <$> (Prelude.take noOfStories
                 <$> (Prelude.concat 
-                <$> (Prelude.map (fromRight :: Either a b -> b) 
+                <$> (Prelude.map (DEU.fromRight :: Either a b -> b)
                 <$> (Prelude.filter (isRight :: Either a b -> Bool) 
                 <$> (liftIO $ mapConcurrently (with semaphore .
                         (\subTreeLink -> do
@@ -239,7 +239,7 @@ hnConcurrentLevelByLevel userNoOfCommentsMapIORef itemUrlRoot noOfStories =
                             return $ eitherSubTree))
                     (subTreeLinks) ))))) 
         storiesM semaphore linksOfStories =
-            (Prelude.map (fromRight) 
+            (Prelude.map (DEU.fromRight)
                 <$> (filter (isRight :: Either a b -> Bool) 
                 <$> (liftIO $ mapConcurrently (with semaphore .
                     (\linkOfStory -> do
@@ -257,7 +257,7 @@ hnConcurrentLevelByLevel userNoOfCommentsMapIORef itemUrlRoot noOfStories =
                     return ()))
                 (stories) 
         commentsOfStoriesM semaphore linksOfCommentsOfStories =
-            Prelude.map fromRight 
+            Prelude.map DEU.fromRight
                 <$> (filter isRight 
                 <$> (liftIO $ mapConcurrently (with semaphore .
                         (\linkOfCommentsOfStories -> do
@@ -268,7 +268,7 @@ hnConcurrentLevelByLevel userNoOfCommentsMapIORef itemUrlRoot noOfStories =
                             return $ eitherCommentOfStory))
                     (linksOfCommentsOfStories)))
         subTreesM semaphore subTreeLinks =
-            Prelude.map fromRight 
+            Prelude.map DEU.fromRight
                 <$> (filter isRight 
                 <$> (liftIO $ mapConcurrently (with semaphore .
                     (\subTreeLink -> do
